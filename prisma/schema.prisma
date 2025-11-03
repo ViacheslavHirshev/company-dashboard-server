@@ -1,0 +1,38 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model companies {
+  id           Int      @id @default(autoincrement())
+  company_name String
+  created_at   DateTime @db.Date
+  capital      Decimal  @db.Decimal(15, 2)
+  logo         String?
+  address      String?
+  owner_id     Int
+  users        users    @relation(fields: [owner_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_owner_id")
+}
+
+model roles {
+  id        Int     @id @default(autoincrement())
+  role_name String
+  users     users[]
+}
+
+model users {
+  id        Int         @id @default(autoincrement())
+  firstname String
+  lastname  String
+  email     String
+  password  String
+  role_id   Int
+  avatar    String?
+  companies companies[]
+  roles     roles       @relation(fields: [role_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_role_id")
+}

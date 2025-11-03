@@ -1,0 +1,41 @@
+{
+  "name": "company-dashboard-server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "npx esling .",
+    "compile": "tsc",
+    "server": "node dist/server",
+    "compile-dev": "tsc --watch",
+    "server-dev": "node dist/server --watch",
+    "pull-schema": "npx prisma db pull",
+    "push-schema": "npx prisma db push",
+    "generate-prisma-client": "npx prisma generate"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "@prisma/client": "^6.18.0",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0",
+    "express-session": "^1.18.2",
+    "passport": "^0.7.0",
+    "passport-local": "^1.0.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.0",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.5",
+    "@types/node": "^24.10.0",
+    "@types/passport": "^1.0.17",
+    "eslint": "^9.39.0",
+    "prisma": "^6.18.0",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.46.2"
+  }
+}
