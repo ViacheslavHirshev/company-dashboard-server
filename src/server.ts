@@ -1,8 +1,6 @@
 import app from "./app";
-import config from "./config/default";
+import { PORT } from "./config/constants";
 
-const port = config.port;
-
-app.listen(port, () =>
-  console.log(`Server successfully started on port: ${port}`)
+app.listen(PORT, () =>
+  console.log(`Server successfully started on port: ${PORT}`)
 );

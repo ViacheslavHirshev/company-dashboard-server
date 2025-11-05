@@ -1,13 +1,18 @@
 import express from "express";
 import cors from "cors";
+import configurePassport from "./config/passport";
+import authRouter from "./routes/auth/auth.route";
+import refreshRouter from "./routes/refresh/refresh.route";
 
 const app = express();
+
+configurePassport();
 
 app.use(express.json());
 app.use(cors());
 
-app.get("/", (req, res) => res.json("Hello, world"));
+app.use("/refresh", refreshRouter);
 
-app.use("/sign-up");
+app.use("/auth", authRouter);
 
 export default app;
