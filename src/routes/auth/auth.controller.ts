@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import passport from "passport";
 import type { app_user } from "../../../generated/prisma/client";
 import { generateAccessToken, generateRefreshToken } from "../../utils/token";
-import { createUser } from "../../services/authService";
+import { createUser } from "../../services/userService";
 import {
   ACCESS_TOKEN_COOKIE_NAME,
   REFRESH_TOKEN_COOKIE_NAME,
