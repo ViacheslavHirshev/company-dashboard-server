@@ -1,9 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import {
-  ACCESS_TOKEN_COOKIE_NAME,
-  REFRESH_SECRET,
-  REFRESH_TOKEN_COOKIE_NAME,
-} from "../../config/constants";
+import { REFRESH_SECRET } from "../../config/constants";
 import jwt from "jsonwebtoken";
 import { generateAccessToken } from "../../utils/token";
 
@@ -12,26 +8,28 @@ export function refreshController(
   res: Response,
   next: NextFunction
 ) {
-  const refreshToken: string = req.cookies[REFRESH_TOKEN_COOKIE_NAME];
+  const authHeader = req.headers.authorization;
+
+  const refreshToken: string | null = authHeader?.startsWith("Bearer ")
+    ? authHeader.split(" ")[1]
+    : null;
 
   try {
-    if (!refreshToken) throw { status: 403, message: "Verification error" };
+    if (!refreshToken)
+      return res.status(403).json({ message: "Verification error" });
 
     jwt.verify(
       refreshToken,
       REFRESH_SECRET!,
       (err: Error | null, user: any) => {
-        if (err) throw { status: 403, message: "Verification error" };
+        if (err) return next(err);
 
         const accessToken = generateAccessToken(user.id, user.role_id);
-        res.cookie(ACCESS_TOKEN_COOKIE_NAME, accessToken, {
-          httpOnly: true,
-          secure: true,
-        });
 
-        res
-          .status(200)
-          .json({ message: "Access token refreshed successfully" });
+        res.status(200).json({
+          message: "Access token refreshed",
+          accessToken,
+        });
       }
     );
   } catch (error) {

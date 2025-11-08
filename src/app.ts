@@ -14,12 +14,14 @@ import superadminDashboardRouter from "./routes/superadmin/superadminDashboard.r
 import superadminCompaniesRouter from "./routes/superadmin/superadminCompanies.route";
 import swaggerDocs from "./config/swagger";
 import { PORT } from "./config/constants";
-import { createUser } from "./services/userService";
+// import { createUser } from "./services/userService";
 
 // ADD prisma typesafety
 // ADD repository pattern
 // ADD controlers to routes
 // Swagger docs
+// When user deleted - avatar needs to be deleted from the /uploads too
+// Avatar deletion
 
 const app = express();
 

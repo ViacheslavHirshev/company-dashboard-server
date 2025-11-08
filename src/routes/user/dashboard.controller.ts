@@ -6,7 +6,5 @@ export async function getDashboardData(
   res: Response,
   next: NextFunction
 ) {
-  if (!req.user) throw { status: 403, message: "User not authorized" };
-
   const { userId } = req.user as TTokenPayload;
 }
