@@ -1,14 +1,16 @@
 import prisma from "../config/prisma";
+import { TCompanyService } from "../types/types";
 
 // Pagination
-// Sorting
-// Filtering
+// Sorting by company name,
+// Filtering by created_at, capital
 
 export async function createCompany(
   userId: number,
   companyName: string,
   createdAt: Date,
-  capital: number
+  capital: number,
+  service: TCompanyService
 ) {
   const company = await prisma.company.create({
     data: {
@@ -16,6 +18,7 @@ export async function createCompany(
       created_at: createdAt,
       capital: capital,
       owner_id: userId,
+      service,
     },
   });
 
@@ -32,7 +35,13 @@ export async function getCompany(companyId: number) {
   return company;
 }
 
-export async function getAllCompanies(userId: number) {
+export async function getAllCompanies() {
+  const companies = await prisma.company.findMany();
+
+  return companies;
+}
+
+export async function getAllCompaniesOfUser(userId: number) {
   const companies = await prisma.company.findMany({
     where: { id: userId },
   });

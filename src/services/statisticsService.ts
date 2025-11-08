@@ -1,7 +1,6 @@
 // STATISTIC FOR ADMIN + SUPERADMIN
 // total number of app users
 // total number of companies
-// total capital per user
 // top-5 users with the heighest capital
 // number of admins
 

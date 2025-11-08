@@ -15,8 +15,7 @@ export function jwtAuthMiddleware(
     }
 
     jwt.verify(accessToken, ACCESS_SECRET!, (err, payload) => {
-      if (err)
-        throw { status: 403, message: "Access token verification failed" };
+      if (err) throw { status: 403, message: "Verification failed" };
 
       req.user = payload;
       next();

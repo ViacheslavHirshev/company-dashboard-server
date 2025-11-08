@@ -1,6 +1,7 @@
 import prisma from "../config/prisma";
 import { TUserRole } from "../types/types";
-import { encryptPassword } from "../utils/password";
+import { comparePassword, encryptPassword } from "../utils/password";
+// import { Prisma } from "@prisma/client";
 
 async function getRoleId(roleName: TUserRole) {
   const { roleId } = await prisma.app_user_role.findUnique({
@@ -8,6 +9,14 @@ async function getRoleId(roleName: TUserRole) {
   });
 
   return roleId;
+}
+
+export async function getRoleById(roleId: number) {
+  const { role } = await prisma.app_user_role.findUnique({
+    where: { id: roleId },
+  });
+
+  return role;
 }
 
 export async function createUser(
@@ -57,31 +66,55 @@ export async function getAllUsersByRole(userRole: TUserRole = "user") {
 export async function updateUser(
   userId: number,
   firstName: string,
-  lastName: string
+  lastName: string,
+  avatarPath?: string | null
 ) {
+  const data: {
+    firstname: string;
+    lastname: string;
+    avatar?: string | null;
+  } = {
+    firstname: firstName,
+    lastname: lastName,
+  };
+
+  if (avatarPath !== undefined) {
+    data.avatar = avatarPath;
+  }
+
   const updatedUser = await prisma.app_user.update({
     where: { id: userId },
-    data: { firstname: firstName, lastname: lastName },
+    data,
   });
 
   return updatedUser;
 }
 
-export async function updateUserAvatar(userId: number, avatarPath: string) {
-  const updatedUser = await prisma.app_user.update({
+async function getUserPassword(userId: number) {
+  const { password } = await prisma.app_user.findUnique({
     where: { id: userId },
-    data: { avatar: avatarPath },
   });
 
-  return updatedUser;
+  return password;
 }
 
-export async function updateUserPassword(userId: number, newPassword: string) {
-  const encryptedPassword = await encryptPassword(newPassword);
+export async function updateUserPassword(
+  userId: number,
+  currentPassword: string,
+  newPassword: string
+) {
+  //current password check
+  const currentHashed = await getUserPassword(userId);
+  const isPasswordSame = await comparePassword(currentPassword, currentHashed);
+
+  if (!isPasswordSame)
+    throw { status: 401, message: "Current password incorrect" };
+
+  const newEncrypted = await encryptPassword(newPassword);
 
   const updatedUser = await prisma.app_user.update({
     where: { id: userId },
-    data: { password: encryptedPassword },
+    data: { password: newEncrypted },
   });
 
   return updatedUser;

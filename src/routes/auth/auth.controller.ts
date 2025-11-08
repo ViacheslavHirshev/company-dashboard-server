@@ -21,7 +21,7 @@ export async function signUpController(
     }
 
     await createUser(firstName, lastName, email, password);
-    res.status(201).json({ message: "User created successfully" });
+    res.status(200).json({ message: "User created successfully" });
   } catch (error) {
     console.log(error);
     next(error);
