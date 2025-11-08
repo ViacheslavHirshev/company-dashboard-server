@@ -13,8 +13,6 @@ export async function getUserData(
   res: Response,
   next: NextFunction
 ) {
-  if (!req.user) throw { status: 403, message: "User not authorized" };
-
   const { userId } = req.user as TTokenPayload;
 
   try {
@@ -34,9 +32,7 @@ export async function changeUserData(
   res: Response,
   next: NextFunction
 ) {
-  if (!req.user) throw { status: 403, message: "User not authorized" };
-
-  const { userId } = req.user as { userId: number; roleId: number };
+  const { userId } = req.user as TTokenPayload;
   const avatar = req.file;
   const { firstName, lastName } = req.body;
 
@@ -47,7 +43,7 @@ export async function changeUserData(
     let newAvatarPath: string | null | undefined = undefined;
 
     if (avatar) {
-      if (user.avatar) {
+      if (user?.avatar) {
         const oldPath = path.join(
           "uploads/avatars",
           path.basename(user.avatar)
@@ -80,9 +76,7 @@ export async function changeUserPassword(
   res: Response,
   next: NextFunction
 ) {
-  if (!req.user) throw { status: 403, message: "User not authorized" };
-
-  const { userId } = req.user as { userId: number; roleId: number };
+  const { userId } = req.user as TTokenPayload;
   const { currentPassword, newPassword } = req.body;
 
   try {

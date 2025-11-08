@@ -3,10 +3,6 @@ import passport from "passport";
 import type { app_user } from "../../../generated/prisma/client";
 import { generateAccessToken, generateRefreshToken } from "../../utils/token";
 import { createUser } from "../../services/userService";
-import {
-  ACCESS_TOKEN_COOKIE_NAME,
-  REFRESH_TOKEN_COOKIE_NAME,
-} from "../../config/constants";
 
 export async function signUpController(
   req: Request,
@@ -43,34 +39,28 @@ export async function signInController(
       { session: false },
       (err: Error | null, user: app_user, info?: { message?: string }) => {
         if (err) {
-          throw err;
+          return next(err);
         }
 
         if (!user && info?.message) {
-          throw new Error(info.message);
+          return res.status(400).json({ message: info.message });
         }
 
-        const { id, firstname, lastname, email, role_id } = user;
+        const { id, firstname, lastname, role_id, avatar } = user;
 
         const accessToken = generateAccessToken(id, role_id);
         const refreshToken = generateRefreshToken(id, role_id);
 
-        res.cookie(ACCESS_TOKEN_COOKIE_NAME, accessToken, {
-          httpOnly: true,
-          secure: true,
-        });
-
-        res.cookie(REFRESH_TOKEN_COOKIE_NAME, refreshToken, {
-          httpOnly: true,
-          secure: true,
-        });
-
         res.status(200).json({
-          userData: { firstname, lastname, email },
+          userData: { id, firstname, lastname, avatar },
+          tokens: {
+            accessToken,
+            refreshToken,
+          },
           message: "User successfully loged-in",
         });
       }
-    );
+    )(req, res, next);
   } catch (error) {
     console.log(error);
     next(error);

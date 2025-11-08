@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { ACCESS_SECRET, ACCESS_TOKEN_COOKIE_NAME } from "../config/constants";
+import { ACCESS_SECRET } from "../config/constants";
 import jwt from "jsonwebtoken";
 
 export function jwtAuthMiddleware(
@@ -7,7 +7,10 @@ export function jwtAuthMiddleware(
   res: Response,
   next: NextFunction
 ) {
-  const accessToken: string = req.cookies[ACCESS_TOKEN_COOKIE_NAME];
+  const authHeader = req.headers.authorization;
+  const accessToken: string | null = authHeader?.startsWith("Bearer ")
+    ? authHeader.split(" ")[1]
+    : null;
 
   try {
     if (!accessToken) {

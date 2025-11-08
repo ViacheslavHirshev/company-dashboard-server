@@ -22,7 +22,7 @@ model app_user {
 
 model app_user_role {
   id        Int        @id(map: "roles_pkey") @default(autoincrement())
-  role_name String
+  role_name String     @unique 
   app_user  app_user[]
 }
 

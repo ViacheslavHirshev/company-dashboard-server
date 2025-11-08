@@ -4,19 +4,19 @@ import { comparePassword, encryptPassword } from "../utils/password";
 // import { Prisma } from "@prisma/client";
 
 export async function getRoleId(roleName: TUserRole) {
-  const { roleId } = await prisma.app_user_role.findUnique({
+  const user_role = await prisma.app_user_role.findUnique({
     where: { role_name: roleName },
   });
 
-  return roleId;
+  return user_role?.id;
 }
 
 export async function getRoleById(roleId: number) {
-  const { role } = await prisma.app_user_role.findUnique({
+  const user_role = await prisma.app_user_role.findUnique({
     where: { id: roleId },
   });
 
-  return role;
+  return user_role?.role_name;
 }
 
 export async function createUser(
@@ -26,6 +26,7 @@ export async function createUser(
   password: string,
   role: TUserRole = "user"
 ) {
+  const roleId = await getRoleId(role);
   const encryptedPassword = await encryptPassword(password);
 
   const user = await prisma.app_user.create({
@@ -34,7 +35,7 @@ export async function createUser(
       lastname: lastName,
       email,
       password: encryptedPassword,
-      role,
+      role_id: roleId!,
     },
   });
 
@@ -91,11 +92,11 @@ export async function updateUser(
 }
 
 async function getUserPassword(userId: number) {
-  const { password } = await prisma.app_user.findUnique({
+  const user = await prisma.app_user.findUnique({
     where: { id: userId },
   });
 
-  return password;
+  return user?.password;
 }
 
 export async function updateUserPassword(
@@ -105,7 +106,7 @@ export async function updateUserPassword(
 ) {
   //current password check
   const currentHashed = await getUserPassword(userId);
-  const isPasswordSame = await comparePassword(currentPassword, currentHashed);
+  const isPasswordSame = await comparePassword(currentPassword, currentHashed!);
 
   if (!isPasswordSame)
     throw { status: 401, message: "Current password incorrect" };

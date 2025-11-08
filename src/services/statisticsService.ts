@@ -21,7 +21,7 @@ export async function getHeighestCapitalCompanies(itemsToGet: number) {
 }
 
 export async function getTotalNumberOfAdmins() {
-  const admin_role_id = getRoleId("admin");
+  const admin_role_id = await getRoleId("admin");
 
   return await prisma.app_user.count({ where: { id: admin_role_id } });
 }

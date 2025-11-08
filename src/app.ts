@@ -3,7 +3,6 @@ import cors from "cors";
 import configurePassport from "./config/passport";
 import authRouter from "./routes/auth/auth.route";
 import refreshRouter from "./routes/refresh/refresh.route";
-import { createUser } from "./services/userService";
 import userProfileRouter from "./routes/user/profile.route";
 import userDashboardRouter from "./routes/user/dashboard.route";
 import userCompaniesRouter from "./routes/user/companies.route";
@@ -13,11 +12,14 @@ import adminCompaniesRouter from "./routes/admin/adminCompanies.route";
 import superadminProfileRouter from "./routes/superadmin/superadminProfile.route";
 import superadminDashboardRouter from "./routes/superadmin/superadminDashboard.route";
 import superadminCompaniesRouter from "./routes/superadmin/superadminCompanies.route";
+import swaggerDocs from "./config/swagger";
+import { PORT } from "./config/constants";
+import { createUser } from "./services/userService";
 
 // ADD prisma typesafety
 // ADD repository pattern
-// ADD service functions for statistics
 // ADD controlers to routes
+// Swagger docs
 
 const app = express();
 
@@ -45,6 +47,9 @@ app.use("/admin/companies", adminCompaniesRouter);
 app.use("/superadmin/profile", superadminProfileRouter);
 app.use("/superadmin/dashboard", superadminDashboardRouter);
 app.use("/superadmin/companies", superadminCompaniesRouter);
+
+// API swagger docs
+swaggerDocs(app, PORT);
 
 // <---------- FOR FRESH SERVER START ---------->
 // createUser(
