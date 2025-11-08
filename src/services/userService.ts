@@ -3,7 +3,7 @@ import { TUserRole } from "../types/types";
 import { comparePassword, encryptPassword } from "../utils/password";
 // import { Prisma } from "@prisma/client";
 
-async function getRoleId(roleName: TUserRole) {
+export async function getRoleId(roleName: TUserRole) {
   const { roleId } = await prisma.app_user_role.findUnique({
     where: { role_name: roleName },
   });

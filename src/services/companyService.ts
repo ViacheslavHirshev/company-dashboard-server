@@ -51,12 +51,12 @@ export async function getAllCompaniesOfUser(userId: number) {
 
 export async function getAllCompaniesPaginated(
   userId: number,
-  elementsToTake: number,
+  itemsToGet: number,
   skip: number
 ) {
   const companies = await prisma.company.findMany({
     skip,
-    take: elementsToTake,
+    take: itemsToGet,
     where: { id: userId },
   });
 
