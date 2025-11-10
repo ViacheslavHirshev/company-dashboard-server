@@ -23,9 +23,9 @@ app.use("/refresh", refreshRouter);
 app.use("/auth", authRouter);
 
 // App routes
-app.use("/app/profile", profileRouter);
-app.use("/app/dashboard", dashboardRouter);
-app.use("/app/companies", companiesRouter);
+app.use("/profile", profileRouter);
+app.use("/dashboard", dashboardRouter);
+app.use("/companies", companiesRouter);
 
 // API swagger docs
 swaggerDocs(app, PORT);

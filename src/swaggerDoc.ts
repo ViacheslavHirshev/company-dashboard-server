@@ -137,7 +137,7 @@
 
 /**
  * @openapi
- * /app/companies:
+ * /companies:
  *   get:
  *     summary: Get all companies of the authenticated user
  *     description: Returns a paginated list of companies created by the current user. Supports sorting and filtering by date, capital, and service.
@@ -217,7 +217,7 @@
 
 /**
  * @openapi
- * /app/companies/{id}:
+ * /companies/{id}:
  *   get:
  *     summary: Get a specific company by ID
  *     description: Returns detailed information about a single company belonging to the authenticated user.
@@ -258,7 +258,7 @@
 
 /**
  * @openapi
- * /app/companies:
+ * /companies:
  *   post:
  *     summary: Create a new company
  *     description: Creates a new company record for the authenticated user. Supports optional company logo upload.
@@ -313,7 +313,7 @@
 
 /**
  * @openapi
- * /app/companies/{id}:
+ * /companies/{id}:
  *   put:
  *     summary: Update company information
  *     description: Updates the basic company details such as name, capital, service, and address fields.
@@ -363,7 +363,7 @@
 
 /**
  * @openapi
- * /app/companies/{id}:
+ * /companies/{id}:
  *   patch:
  *     summary: Update or delete company logo
  *     description: >
@@ -430,7 +430,7 @@
 
 /**
  * @openapi
- * /app/companies/{id}:
+ * /companies/{id}:
  *   delete:
  *     summary: Delete a company
  *     description: Permanently deletes a company owned by the authenticated user.
@@ -456,7 +456,7 @@
 
 /**
  * @openapi
- * /app/companies/admin:
+ * /companies/admin:
  *   get:
  *     summary: Get all companies (admin)
  *     description: Returns a paginated list of all companies in the system
@@ -530,7 +530,7 @@
  *       500:
  *         description: Internal server error
  *
- * /app/companies/superadmin:
+ * /companies/superadmin:
  *   get:
  *     summary: Get all companies (superadmin)
  *     description: Returns a paginated list of all companies in the system. Identical to the admin endpoint, but also accessible to superadmin.
@@ -594,7 +594,7 @@
 
 /**
  * @openapi
- * /app/companies/admin/{id}:
+ * /companies/admin/{id}:
  *   get:
  *     summary: Get detailed company info (admin or superadmin only)
  *     description: Returns detailed information about a specific company, including the owner's name and logo URL.
@@ -663,7 +663,7 @@
 
 /**
  * @openapi
- * /app/dashboard:
+ * /dashboard:
  *   get:
  *     summary: Get user dashboard data
  *     description: Returns total number of user’s companies, total capital, and a paginated list of their companies. Requires user role.
@@ -763,7 +763,7 @@
 
 /**
  * @openapi
- * /app/dashboard/admin/users:
+ * /dashboard/admin/users:
  *   get:
  *     summary: Get paginated list of users (admin or superadmin only)
  *     description: Returns total count and a paginated list of all users with role "user".
@@ -828,7 +828,7 @@
  *       500:
  *         description: Internal server error
  *
- * /app/dashboard/superadmin/users:
+ * /dashboard/superadmin/users:
  *   get:
  *     summary: Get paginated list of users (superadmin)
  *     description: Same as admin endpoint, accessible to superadmin role as well.
@@ -874,7 +874,7 @@
 
 /**
  * @openapi
- * /app/dashboard/admin/companies:
+ * /dashboard/admin/companies:
  *   get:
  *     summary: Get paginated list of all companies (admin or superadmin)
  *     description: Returns total number of companies and a paginated list of all companies in the system.
@@ -951,7 +951,7 @@
  *       500:
  *         description: Internal server error
  *
- * /app/dashboard/superadmin/companies:
+ * /dashboard/superadmin/companies:
  *   get:
  *     summary: Get paginated list of all companies (superadmin)
  *     description: Same as the admin companies endpoint, but also accessible to superadmin.
@@ -1015,7 +1015,7 @@
 
 /**
  * @openapi
- * /app/dashboard/superadmin/admins:
+ * /dashboard/superadmin/admins:
  *   get:
  *     summary: Get paginated list of all admins (superadmin only)
  *     description: Returns total number of admins and a paginated list of admin accounts in the system.
@@ -1083,7 +1083,7 @@
 
 /**
  * @openapi
- * /app/dashboard/superadmin/admins:
+ * /dashboard/superadmin/admins:
  *   post:
  *     summary: Create a new admin (superadmin only)
  *     description: Creates a new admin account. All fields are required.
@@ -1146,7 +1146,7 @@
 
 /**
  * @openapi
- * /app/dashboard/superadmin/admins/{id}:
+ * /dashboard/superadmin/admins/{id}:
  *   get:
  *     summary: Get detailed admin info (superadmin only)
  *     description: Returns profile information about a specific admin, including avatar and contact details.
@@ -1199,7 +1199,7 @@
 
 /**
  * @openapi
- * /app/dashboard/superadmin/admins/{id}:
+ * /dashboard/superadmin/admins/{id}:
  *   put:
  *     summary: Update admin information (superadmin only)
  *     description: Updates the specified admin’s profile fields such as first name and last name. Requires superadmin privileges.
@@ -1266,7 +1266,7 @@
 
 /**
  * @openapi
- * /app/dashboard/superadmin/admins/{id}:
+ * /dashboard/superadmin/admins/{id}:
  *   delete:
  *     summary: Delete admin (superadmin only)
  *     description: Permanently deletes an admin account. This action can only be performed by a superadmin.
@@ -1303,7 +1303,7 @@
 
 /**
  * @openapi
- * /app/profile:
+ * /profile:
  *   get:
  *     summary: Get user profile
  *     description: Returns the authenticated user's profile information including name, avatar, and role.
@@ -1345,7 +1345,7 @@
 
 /**
  * @openapi
- * /app/profile:
+ * /profile:
  *   put:
  *     summary: Update user profile data
  *     description: Updates the user's first and last name. Requires authentication.
@@ -1402,7 +1402,7 @@
 
 /**
  * @openapi
- * /app/profile:
+ * /profile:
  *   patch:
  *     summary: Update or delete user avatar
  *     description: Uploads a new avatar image or deletes the existing one if `deleteAvatar=true` is provided.
@@ -1447,7 +1447,7 @@
 
 /**
  * @openapi
- * /app/profile/password-change:
+ * /profile/password-change:
  *   put:
  *     summary: Change user password
  *     description: Allows an authenticated user to change their password by providing the current and new password.
