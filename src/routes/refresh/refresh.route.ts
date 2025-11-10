@@ -3,26 +3,24 @@ import { refreshController } from "./refresh.controller";
 
 const refreshRouter = Router();
 
+refreshRouter.get("/", refreshController);
+
+export default refreshRouter;
+
 /**
  * @openapi
  * /refresh:
  *   get:
+ *     summary: Refresh access token
+ *     description: Verifies a valid refresh token and returns a new access token.
+ *       The refresh token must be provided in the `Authorization` header as a Bearer token.
  *     tags:
  *       - Authentication
- *     summary: Refresh access token using refresh token
- *     description: |
- *       Requires a valid refresh token passed in the `Authorization` header as `Bearer <refreshToken>`.
- *     parameters:
- *       - in: header
- *         name: Authorization
- *         required: true
- *         schema:
- *           type: string
- *           example: Bearer <refresh_token>
- *         description: Refresh token in Bearer format
+ *     security:
+ *       - bearerAuth: []
  *     responses:
  *       200:
- *         description: New access token issued
+ *         description: Successfully generated new access token
  *         content:
  *           application/json:
  *             schema:
@@ -30,11 +28,12 @@ const refreshRouter = Router();
  *               properties:
  *                 message:
  *                   type: string
- *                   example: Access token refreshed successfully
+ *                   example: Access token refreshed
  *                 accessToken:
  *                   type: string
+ *                   example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
  *       403:
- *         description: Invalid or missing refresh token
+ *         description: Missing or invalid refresh token
  *         content:
  *           application/json:
  *             schema:
@@ -43,7 +42,6 @@ const refreshRouter = Router();
  *                 message:
  *                   type: string
  *                   example: Verification error
+ *       500:
+ *         description: Internal server error
  */
-refreshRouter.get("/", refreshController);
-
-export default refreshRouter;

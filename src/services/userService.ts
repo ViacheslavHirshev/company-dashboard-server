@@ -1,23 +1,9 @@
+import path from "path";
+import fs from "fs";
 import prisma from "../config/prisma";
 import { TUserRole } from "../types/types";
 import { comparePassword, encryptPassword } from "../utils/password";
 // import { Prisma } from "@prisma/client";
-
-export async function getRoleId(roleName: TUserRole) {
-  const user_role = await prisma.app_user_role.findUnique({
-    where: { role_name: roleName },
-  });
-
-  return user_role?.id;
-}
-
-export async function getRoleById(roleId: number) {
-  const user_role = await prisma.app_user_role.findUnique({
-    where: { id: roleId },
-  });
-
-  return user_role?.role_name;
-}
 
 export async function createUser(
   firstName: string,
@@ -42,23 +28,43 @@ export async function createUser(
   return user;
 }
 
+export async function getRoleId(roleName: TUserRole) {
+  const user_role = await prisma.app_user_role.findUnique({
+    where: { role_name: roleName },
+  });
+
+  return user_role?.id;
+}
+
+export async function getRoleName(roleId: number) {
+  const user_role = await prisma.app_user_role.findUnique({
+    where: { id: roleId },
+  });
+
+  return user_role?.role_name;
+}
+
 export async function getUser(userId: number) {
   const user = await prisma.app_user.findUnique({ where: { id: userId } });
 
   return user;
 }
 
-export async function getAllUsers() {
-  const users = await prisma.app_user.findMany();
-
-  return users;
-}
-
-export async function getAllUsersByRole(userRole: TUserRole = "user") {
+export async function getAllUsersPaginated(
+  userRole: TUserRole = "user",
+  itemsToGet: number,
+  skip: number,
+  sortBy?: "firstname" | "lastname",
+  sortOrder: "asc" | "desc" = "asc"
+) {
+  const orderBy = sortBy ? { [sortBy]: sortOrder } : undefined;
   const roleId = await getRoleId(userRole);
 
   const users = await prisma.app_user.findMany({
     where: { role_id: roleId },
+    skip,
+    take: itemsToGet,
+    orderBy,
   });
 
   return users;
@@ -67,25 +73,14 @@ export async function getAllUsersByRole(userRole: TUserRole = "user") {
 export async function updateUser(
   userId: number,
   firstName: string,
-  lastName: string,
-  avatarPath?: string | null
+  lastName: string
 ) {
-  const data: {
-    firstname: string;
-    lastname: string;
-    avatar?: string | null;
-  } = {
-    firstname: firstName,
-    lastname: lastName,
-  };
-
-  if (avatarPath !== undefined) {
-    data.avatar = avatarPath;
-  }
-
   const updatedUser = await prisma.app_user.update({
     where: { id: userId },
-    data,
+    data: {
+      firstname: firstName,
+      lastname: lastName,
+    },
   });
 
   return updatedUser;
@@ -121,6 +116,34 @@ export async function updateUserPassword(
   return updatedUser;
 }
 
+export async function updateUserAvatar(userId: number, avatar?: string | null) {
+  if (avatar !== undefined) {
+    await deleteAvatarFile(userId);
+
+    const updatedUser = await prisma.app_user.update({
+      where: { id: userId },
+      data: {
+        avatar,
+      },
+    });
+
+    return updatedUser.avatar;
+  }
+}
+
+export async function deleteAvatarFile(userId: number) {
+  const user = await getUser(userId);
+
+  if (user?.avatar) {
+    const avatarPath = path.join("uploads/avatars", path.basename(user.avatar));
+
+    if (fs.existsSync(avatarPath)) {
+      fs.unlinkSync(avatarPath);
+    }
+  }
+}
+
 export async function deleteUser(userId: number) {
+  await deleteAvatarFile(userId);
   await prisma.app_user.delete({ where: { id: userId } });
 }

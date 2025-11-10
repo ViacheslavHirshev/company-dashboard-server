@@ -1,25 +1,39 @@
+import path from "path";
 import prisma from "../config/prisma";
-import { TCompanyService } from "../types/types";
-
-// Pagination
-// Sorting by company name,
-// Filtering by created_at, capital
+import fs from "fs";
 
 export async function createCompany(
   userId: number,
   companyName: string,
   createdAt: Date,
   capital: number,
-  service: TCompanyService
+  service: string,
+  address: string,
+  logo?: string | null
 ) {
+  const data: {
+    company_name: string;
+    created_at: Date;
+    capital: number;
+    service: string;
+    owner_id: number;
+    address: string;
+    logo?: string | null;
+  } = {
+    company_name: companyName,
+    created_at: createdAt,
+    capital,
+    service,
+    address,
+    owner_id: userId,
+  };
+
+  if (logo !== undefined) {
+    data.logo = logo;
+  }
+
   const company = await prisma.company.create({
-    data: {
-      company_name: companyName,
-      created_at: createdAt,
-      capital: capital,
-      owner_id: userId,
-      service,
-    },
+    data,
   });
 
   return company;
@@ -35,36 +49,45 @@ export async function getCompany(companyId: number) {
   return company;
 }
 
-export async function getAllCompanies() {
-  const companies = await prisma.company.findMany();
-
-  return companies;
-}
-
-export async function getAllCompaniesOfUser(userId: number) {
-  const companies = await prisma.company.findMany({
-    where: { id: userId },
-  });
-
-  return companies;
-}
-
 export async function getAllCompaniesPaginated(
-  userId: number,
   itemsToGet: number,
-  skip: number
+  skip: number,
+  userId?: number,
+  sortBy?: "company_name" | "service",
+  sortOrder: "asc" | "desc" = "asc",
+  minCapital?: number,
+  maxCapital?: number,
+  startDate?: Date,
+  endDate?: Date
 ) {
+  const where: any = {};
+
+  if (userId) {
+    where.owner_id = userId;
+  }
+
+  if (minCapital !== undefined || maxCapital !== undefined) {
+    where.capital = {};
+    if (minCapital) where.capital.gte = minCapital;
+    if (maxCapital) where.capital.lte = maxCapital;
+  }
+
+  if (startDate !== undefined || endDate !== undefined) {
+    where.created_at = {};
+    if (startDate) where.created_at.gte = startDate;
+    if (endDate) where.created_at.lte = endDate;
+  }
+
+  const orderBy = sortBy ? { [sortBy]: sortOrder } : undefined;
+
   const companies = await prisma.company.findMany({
     skip,
     take: itemsToGet,
-    where: { id: userId },
+    where,
+    orderBy,
   });
 
   return companies;
-}
-
-export async function deleteCompany(companyId: number) {
-  await prisma.company.delete({ where: { id: companyId } });
 }
 
 export async function updateCompany(
@@ -72,6 +95,7 @@ export async function updateCompany(
   companyName: string,
   createdAt: Date,
   capital: number,
+  service: string,
   address: string
 ) {
   const updatedCompany = await prisma.company.update({
@@ -80,6 +104,7 @@ export async function updateCompany(
       company_name: companyName,
       created_at: createdAt,
       capital,
+      service,
       address,
     },
   });
@@ -87,11 +112,40 @@ export async function updateCompany(
   return updatedCompany;
 }
 
-export async function updateCompanyLogo(companyId: number, logoPath: string) {
-  const updatedCompany = await prisma.company.update({
-    where: { id: companyId },
-    data: { logo: logoPath },
-  });
+export async function updateCompanyLogo(
+  companyId: number,
+  logo?: string | null
+) {
+  if (logo !== undefined) {
+    await deleteLogoFile(companyId);
 
-  return updatedCompany;
+    const updatedCompany = await prisma.company.update({
+      where: { id: companyId },
+      data: {
+        logo: logo,
+      },
+    });
+
+    return updatedCompany.logo;
+  }
+}
+
+export async function deleteCompany(companyId: number) {
+  await deleteLogoFile(companyId);
+  await prisma.company.delete({ where: { id: companyId } });
+}
+
+export async function deleteLogoFile(companyId: number) {
+  const company = await getCompany(companyId);
+
+  if (company?.logo) {
+    const logoPath = path.join(
+      "uploads/logotypes",
+      path.basename(company.logo)
+    );
+
+    if (fs.existsSync(logoPath)) {
+      fs.unlinkSync(logoPath);
+    }
+  }
 }
