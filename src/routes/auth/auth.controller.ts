@@ -51,7 +51,7 @@ export async function signInController(
           return res.status(400).json({ message: info.message });
         }
 
-        const { id, firstname, lastname, role_id, avatar } = user;
+        const { id, role_id, avatar } = user;
 
         const accessToken = generateAccessToken(id, role_id);
         const refreshToken = generateRefreshToken(id, role_id);
@@ -67,13 +67,7 @@ export async function signInController(
         }
 
         res.status(200).json({
-          userData: {
-            id,
-            firstName: firstname,
-            lastName: lastname,
-            avatar: avatarPath,
-            role: roleName,
-          },
+          userRole: roleName,
           tokens: {
             accessToken,
             refreshToken,

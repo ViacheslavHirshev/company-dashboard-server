@@ -91,24 +91,9 @@
  *             schema:
  *               type: object
  *               properties:
- *                 userData:
- *                   type: object
- *                   properties:
- *                     id:
- *                       type: integer
- *                       example: 1
- *                     firstName:
- *                       type: string
- *                       example: John
- *                     lastName:
- *                       type: string
- *                       example: Doe
- *                     avatar:
- *                       type: string
- *                       example: https://api.example.com/uploads/avatars/avatar.png
- *                     role:
- *                       type: string
- *                       example: user
+ *                 userRole:
+ *                   type: string
+ *                   example: user
  *                 tokens:
  *                   type: object
  *                   properties:
