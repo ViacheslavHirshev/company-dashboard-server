@@ -42,7 +42,7 @@ swaggerDocs(app, PORT);
 
 // App level error handler
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
-  res.status(err.status || 500).json({ error: { message: err.message } });
+  res.status(err.status || 500).json({ message: err.message });
 });
 
 export default app;
