@@ -12,13 +12,13 @@ export function jwtAuthMiddleware(
     ? authHeader.split(" ")[1]
     : null;
 
-  try {
-    if (!accessToken) {
-      throw { status: 403, message: "User not authorized" };
-    }
+  if (!accessToken) {
+    throw { status: 401, message: "User not authorized" };
+  }
 
+  try {
     jwt.verify(accessToken, ACCESS_SECRET!, (err, payload) => {
-      if (err) throw { status: 403, message: "Verification failed" };
+      if (err) throw { status: 401, message: "Access token outdated" };
 
       req.user = payload;
       next();

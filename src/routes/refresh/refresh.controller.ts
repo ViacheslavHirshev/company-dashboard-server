@@ -14,17 +14,17 @@ export function refreshController(
     ? authHeader.split(" ")[1]
     : null;
 
-  try {
-    if (!refreshToken)
-      return res.status(403).json({ message: "Verification error" });
+  if (!refreshToken)
+    return res.status(401).json({ message: "Refresh token not provided" });
 
+  try {
     jwt.verify(
       refreshToken,
       REFRESH_SECRET!,
       (err: Error | null, user: any) => {
         if (err) return next(err);
 
-        const accessToken = generateAccessToken(user.id, user.role_id);
+        const accessToken = generateAccessToken(user.userId, user.roleId);
 
         res.status(200).json({
           message: "Access token refreshed",

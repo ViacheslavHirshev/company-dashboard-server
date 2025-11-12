@@ -3,7 +3,7 @@ import { ACCESS_SECRET, REFRESH_SECRET } from "../config/constants";
 
 export function generateAccessToken(userId: number, roleId: number) {
   return jwt.sign({ userId, roleId }, ACCESS_SECRET!, {
-    expiresIn: "15m",
+    expiresIn: "30m",
   });
 }
 
