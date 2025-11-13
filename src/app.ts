@@ -8,6 +8,8 @@ import dashboardRouter from "./routes/dashboard/dashboard.route";
 import companiesRouter from "./routes/companies/companies.route";
 import swaggerDocs from "./config/swagger";
 import { PORT } from "./config/constants";
+import path from "path";
+
 // import { createUser } from "./services/userService";
 
 const app = express();
@@ -17,6 +19,9 @@ configurePassport();
 // Express middleware
 app.use(express.json());
 app.use(cors());
+
+const staticPath = path.join(process.cwd(), "uploads");
+app.use("/uploads", express.static(staticPath));
 
 // Authentication
 app.use("/refresh", refreshRouter);

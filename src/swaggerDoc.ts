@@ -194,6 +194,9 @@
  *                         type: string
  *                       service:
  *                         type: string
+ *                       capital:
+ *                         type: number
+ *                         example: 50000
  *       403:
  *         description: Unauthorized or forbidden access
  *       500:

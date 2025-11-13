@@ -55,6 +55,7 @@ export async function userGetCompanies(
         id: value.id,
         name: value.company_name,
         service: value.service,
+        capital: value.capital,
       };
     });
 
@@ -132,7 +133,7 @@ export async function userAddNewCompany(
       userId,
       companyName,
       new Date(createdAt),
-      capital,
+      Number(capital),
       service,
       address,
       logo?.filename
