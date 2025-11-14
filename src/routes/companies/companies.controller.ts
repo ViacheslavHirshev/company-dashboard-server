@@ -3,13 +3,13 @@ import { TTokenPayload } from "../../types/types";
 import {
   createCompany,
   deleteCompany,
-  deleteLogoFile,
   getAllCompaniesPaginated,
   getCompany,
   updateCompany,
   updateCompanyLogo,
 } from "../../services/companyService";
 import { getUser } from "../../services/userService";
+import { countAllUserCompanies } from "../../services/dashboardService";
 
 export async function userGetCompanies(
   req: Request,
@@ -38,8 +38,8 @@ export async function userGetCompanies(
     : undefined;
 
   try {
-    const companies = (
-      await getAllCompaniesPaginated(
+    const [companiesResult, totalCount] = await Promise.all([
+      getAllCompaniesPaginated(
         limit,
         skip,
         userId,
@@ -49,8 +49,11 @@ export async function userGetCompanies(
         maxCapital,
         startDate,
         endDate
-      )
-    ).map((value) => {
+      ),
+      countAllUserCompanies(userId, minCapital, maxCapital, startDate, endDate),
+    ]);
+
+    const companies = companiesResult.map((value) => {
       return {
         id: value.id,
         name: value.company_name,
@@ -58,8 +61,11 @@ export async function userGetCompanies(
         capital: value.capital,
       };
     });
+    const totalPages = Math.ceil(totalCount / limit);
 
-    return res.status(200).json({ companies });
+    return res
+      .status(200)
+      .json({ companies, totalPages, currentPage: page, totalCount });
   } catch (error) {
     console.log(error);
     next(error);
@@ -182,15 +188,25 @@ export async function userUpdateCompanyInfo(
   } = req.body;
   const address = `${country}, ${city}, ${street}, ${streetNumber}`;
 
+  const baseUrl = `${req.protocol}://${req.get("host")}`;
+
   try {
     const updCompany = await updateCompany(
       companyId,
       companyName,
       new Date(createdAt),
-      capital,
+      Number(capital),
       service,
       address
     );
+
+    let logoPath: string;
+
+    if (updCompany.logo) {
+      logoPath = `${baseUrl}/uploads/logotypes/${updCompany.logo}`;
+    } else {
+      logoPath = `${baseUrl}/uploads/fallback.png`;
+    }
 
     return res.status(200).json({
       message: "Company created",
@@ -201,6 +217,7 @@ export async function userUpdateCompanyInfo(
         capital: updCompany.capital,
         service: updCompany.service,
         address: updCompany.address,
+        logoPath,
       },
     });
   } catch (error) {

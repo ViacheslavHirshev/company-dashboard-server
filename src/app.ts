@@ -12,6 +12,8 @@ import path from "path";
 
 // import { createUser } from "./services/userService";
 
+// UPDATE SWAGGER DOCS
+
 const app = express();
 
 configurePassport();

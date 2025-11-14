@@ -1,6 +1,8 @@
 import { NextFunction, Request, Response } from "express";
 import { TTokenPayload } from "../../types/types";
 import {
+  countAllCompanies,
+  countAllUserCompanies,
   getNumberOfUserCompanies,
   getTotalNumberOfAdmins,
   getTotalNumberOfCompanies,
@@ -43,19 +45,31 @@ export async function getDashboard(
     : undefined;
 
   try {
-    const companies = (
-      await getAllCompaniesPaginated(
-        limit,
-        skip,
-        userId,
-        sortBy,
-        sortOrder || "asc",
-        minCapital,
-        maxCapital,
-        startDate,
-        endDate
-      )
-    ).map((value) => {
+    const [companiesResult, totalCount, companiesNumber, totalCapital] =
+      await Promise.all([
+        getAllCompaniesPaginated(
+          limit,
+          skip,
+          userId,
+          sortBy,
+          sortOrder || "asc",
+          minCapital,
+          maxCapital,
+          startDate,
+          endDate
+        ),
+        countAllUserCompanies(
+          userId,
+          minCapital,
+          maxCapital,
+          startDate,
+          endDate
+        ),
+        getNumberOfUserCompanies(userId),
+        getUserTotalCapital(userId),
+      ]);
+
+    const companies = companiesResult.map((value) => {
       return {
         id: value.id,
         name: value.company_name,
@@ -64,10 +78,15 @@ export async function getDashboard(
       };
     });
 
-    const companiesNumber = await getNumberOfUserCompanies(userId);
-    const totalCapital = await getUserTotalCapital(userId);
+    const totalPages = Math.ceil(totalCount / limit);
 
-    return res.status(200).json({ companiesNumber, totalCapital, companies });
+    return res.status(200).json({
+      companiesNumber,
+      totalCapital,
+      companies,
+      totalPages,
+      currentPage: page,
+    });
   } catch (error) {
     console.log(error);
     next(error);
@@ -87,18 +106,25 @@ export async function getDashboardUsers(
   const sortOrder = req.query.sortOrder as "asc" | "desc" | undefined;
 
   try {
-    const usersTotal = await getTotalNumberOfUsers();
-    const users = (
-      await getAllUsersPaginated("user", limit, skip, sortBy, sortOrder)
-    ).map((value) => {
-      return {
-        id: value.id,
-        firstName: value.firstname,
-        lastName: value.lastname,
-      };
-    });
+    const [usersTotal, usersResult] = await Promise.all([
+      getTotalNumberOfUsers(),
+      getAllUsersPaginated("user", limit, skip, sortBy, sortOrder),
+    ]);
 
-    return res.status(200).json({ usersTotal, users });
+    const users = usersResult.map((value) => ({
+      id: value.id,
+      firstName: value.firstname,
+      lastName: value.lastname,
+    }));
+
+    const totalPages = Math.ceil(usersTotal / limit);
+
+    return res.status(200).json({
+      users,
+      totalPages,
+      currentPage: page,
+      totalCount: usersTotal,
+    });
   } catch (error) {
     console.log(error);
     next(error);
@@ -130,8 +156,8 @@ export async function getDashboardCompanies(
     : undefined;
 
   try {
-    const companies = (
-      await getAllCompaniesPaginated(
+    const [companiesResult, totalCount] = await Promise.all([
+      getAllCompaniesPaginated(
         limit,
         skip,
         undefined,
@@ -141,18 +167,24 @@ export async function getDashboardCompanies(
         maxCapital,
         startDate,
         endDate
-      )
-    ).map((value) => {
-      return {
-        id: value.id,
-        name: value.company_name,
-        service: value.service,
-      };
+      ),
+      countAllCompanies(minCapital, maxCapital, startDate, endDate),
+    ]);
+
+    const companies = companiesResult.map((value) => ({
+      id: value.id,
+      name: value.company_name,
+      service: value.service,
+    }));
+
+    const totalPages = Math.ceil(totalCount / limit);
+
+    return res.status(200).json({
+      companies,
+      totalPages,
+      currentPage: page,
+      totalCount,
     });
-
-    const companiesNumber = await getTotalNumberOfCompanies();
-
-    return res.status(200).json({ companiesNumber, companies });
   } catch (error) {
     console.log(error);
     next(error);
@@ -172,18 +204,25 @@ export async function getDashboardAdmins(
   const sortOrder = req.query.sortOrder as "asc" | "desc" | undefined;
 
   try {
-    const adminsTotal = await getTotalNumberOfAdmins();
-    const users = (
-      await getAllUsersPaginated("admin", limit, skip, sortBy, sortOrder)
-    ).map((value) => {
-      return {
-        id: value.id,
-        firstName: value.firstname,
-        lastName: value.lastname,
-      };
-    });
+    const [adminsTotal, usersResult] = await Promise.all([
+      getTotalNumberOfAdmins(),
+      getAllUsersPaginated("admin", limit, skip, sortBy, sortOrder),
+    ]);
 
-    return res.status(200).json({ adminsTotal, users });
+    const users = usersResult.map((value) => ({
+      id: value.id,
+      firstName: value.firstname,
+      lastName: value.lastname,
+    }));
+
+    const totalPages = Math.ceil(adminsTotal / limit);
+
+    return res.status(200).json({
+      users,
+      totalPages,
+      currentPage: page,
+      totalCount: adminsTotal,
+    });
   } catch (error) {
     console.log(error);
     next(error);
