@@ -3,9 +3,7 @@ import { TTokenPayload } from "../../types/types";
 import {
   countAllCompanies,
   countAllUserCompanies,
-  getNumberOfUserCompanies,
   getTotalNumberOfAdmins,
-  getTotalNumberOfCompanies,
   getTotalNumberOfUsers,
   getUserTotalCapital,
 } from "../../services/dashboardService";
@@ -18,6 +16,7 @@ import {
   updateUser,
 } from "../../services/userService";
 
+// FOR USER
 export async function getDashboard(
   req: Request,
   res: Response,
@@ -29,45 +28,12 @@ export async function getDashboard(
   const limit = req.query.limit ? Number(req.query.limit) : 10;
   const skip = (Number(page) - 1) * Number(limit);
 
-  const sortBy = req.query.sortBy as "company_name" | "service" | undefined;
-  const sortOrder = req.query.sortOrder as "asc" | "desc" | undefined;
-  const minCapital = req.query.minCapital
-    ? Number(req.query.minCapital)
-    : undefined;
-  const maxCapital = req.query.maxCapital
-    ? Number(req.query.maxCapital)
-    : undefined;
-  const startDate = req.query.startDate
-    ? new Date(req.query.startDate as string)
-    : undefined;
-  const endDate = req.query.endDate
-    ? new Date(req.query.endDate as string)
-    : undefined;
-
   try {
-    const [companiesResult, totalCount, companiesNumber, totalCapital] =
-      await Promise.all([
-        getAllCompaniesPaginated(
-          limit,
-          skip,
-          userId,
-          sortBy,
-          sortOrder || "asc",
-          minCapital,
-          maxCapital,
-          startDate,
-          endDate
-        ),
-        countAllUserCompanies(
-          userId,
-          minCapital,
-          maxCapital,
-          startDate,
-          endDate
-        ),
-        getNumberOfUserCompanies(userId),
-        getUserTotalCapital(userId),
-      ]);
+    const [companiesResult, totalCount, totalCapital] = await Promise.all([
+      getAllCompaniesPaginated(limit, skip, userId),
+      countAllUserCompanies(userId),
+      getUserTotalCapital(userId),
+    ]);
 
     const companies = companiesResult.map((value) => {
       return {
@@ -81,7 +47,6 @@ export async function getDashboard(
     const totalPages = Math.ceil(totalCount / limit);
 
     return res.status(200).json({
-      companiesNumber,
       totalCapital,
       companies,
       totalPages,
@@ -93,7 +58,8 @@ export async function getDashboard(
   }
 }
 
-export async function getDashboardUsers(
+//FOR ADMINS
+export async function getAllUsers(
   req: Request,
   res: Response,
   next: NextFunction
@@ -131,7 +97,7 @@ export async function getDashboardUsers(
   }
 }
 
-export async function getDashboardCompanies(
+export async function getAllCompanies(
   req: Request,
   res: Response,
   next: NextFunction
@@ -140,35 +106,10 @@ export async function getDashboardCompanies(
   const limit = req.query.limit ? Number(req.query.limit) : 10;
   const skip = (Number(page) - 1) * Number(limit);
 
-  const sortBy = req.query.sortBy as "company_name" | "service" | undefined;
-  const sortOrder = req.query.sortOrder as "asc" | "desc" | undefined;
-  const minCapital = req.query.minCapital
-    ? Number(req.query.minCapital)
-    : undefined;
-  const maxCapital = req.query.maxCapital
-    ? Number(req.query.maxCapital)
-    : undefined;
-  const startDate = req.query.startDate
-    ? new Date(req.query.startDate as string)
-    : undefined;
-  const endDate = req.query.endDate
-    ? new Date(req.query.endDate as string)
-    : undefined;
-
   try {
     const [companiesResult, totalCount] = await Promise.all([
-      getAllCompaniesPaginated(
-        limit,
-        skip,
-        undefined,
-        sortBy,
-        sortOrder || "asc",
-        minCapital,
-        maxCapital,
-        startDate,
-        endDate
-      ),
-      countAllCompanies(minCapital, maxCapital, startDate, endDate),
+      getAllCompaniesPaginated(limit, skip, undefined),
+      countAllCompanies(),
     ]);
 
     const companies = companiesResult.map((value) => ({
@@ -191,7 +132,87 @@ export async function getDashboardCompanies(
   }
 }
 
-export async function getDashboardAdmins(
+export async function getUserById(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  const userId = Number(req.params.id);
+  const baseUrl = `${req.protocol}://${req.get("host")}`;
+
+  try {
+    const user = await getUser(userId);
+
+    let avatarPath: string;
+
+    if (user?.avatar) {
+      avatarPath = `${baseUrl}/uploads/avatars/${user.avatar}`;
+    } else {
+      avatarPath = `${baseUrl}/uploads/fallback.png`;
+    }
+
+    res.status(200).json({
+      user: {
+        id: user?.id,
+        firstName: user?.firstname,
+        lastName: user?.lastname,
+        email: user?.email,
+        avatar: avatarPath,
+      },
+    });
+  } catch (error) {
+    console.log(error);
+    next(error);
+  }
+}
+
+export async function changeUser(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  const userId = Number(req.params.id);
+  const { firstName, lastName } = req.body;
+  try {
+    const updated = await updateUser(userId, firstName, lastName);
+    return res.status(200).json({
+      message: "User updated",
+      user: {
+        id: updated.id,
+        firstName: updated.firstname,
+        lastName: updated.lastname,
+      },
+    });
+  } catch (error) {
+    console.log(error);
+    next(error);
+  }
+}
+
+export async function deleteUserById(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  // const { userId } = req.user as TTokenPayload;
+  const userId = Number(req.params.id);
+
+  try {
+    // Why i even need it???????
+    // if (userId === userId) {
+    //   return res.status(400).json({ message: "Cannot delete self" });
+    // }
+
+    await deleteUser(userId);
+    return res.status(200).json("Admin deleted");
+  } catch (error) {
+    console.log(error);
+    next(error);
+  }
+}
+
+// FOR SUPERADMIN
+export async function getAllAdmins(
   req: Request,
   res: Response,
   next: NextFunction
@@ -229,41 +250,7 @@ export async function getDashboardAdmins(
   }
 }
 
-export async function getDashboardAdmin(
-  req: Request,
-  res: Response,
-  next: NextFunction
-) {
-  const adminId = Number(req.params.id);
-  const baseUrl = `${req.protocol}://${req.get("host")}`;
-
-  try {
-    const admin = await getUser(adminId);
-
-    let avatarPath: string;
-
-    if (admin?.avatar) {
-      avatarPath = `${baseUrl}/uploads/avatars/${admin.avatar}`;
-    } else {
-      avatarPath = `${baseUrl}/uploads/fallback.png`;
-    }
-
-    res.status(200).json({
-      admin: {
-        id: admin?.id,
-        firstName: admin?.firstname,
-        lastName: admin?.lastname,
-        email: admin?.email,
-        avatar: avatarPath,
-      },
-    });
-  } catch (error) {
-    console.log(error);
-    next(error);
-  }
-}
-
-export async function postDashboardAdmin(
+export async function createAdmin(
   req: Request,
   res: Response,
   next: NextFunction
@@ -277,50 +264,6 @@ export async function postDashboardAdmin(
 
     await createUser(firstName, lastName, email, password, "admin");
     return res.status(200).json({ message: "Admin created successfully" });
-  } catch (error) {
-    console.log(error);
-    next(error);
-  }
-}
-
-export async function putDashboardAdmin(
-  req: Request,
-  res: Response,
-  next: NextFunction
-) {
-  const adminId = Number(req.params.id);
-  const { firstName, lastName } = req.body;
-  try {
-    const updated = await updateUser(adminId, firstName, lastName);
-    return res.status(200).json({
-      message: "Admin updated",
-      admin: {
-        id: updated.id,
-        firstName: updated.firstname,
-        lastName: updated.lastname,
-      },
-    });
-  } catch (error) {
-    console.log(error);
-    next(error);
-  }
-}
-
-export async function deleteDashboardAdmin(
-  req: Request,
-  res: Response,
-  next: NextFunction
-) {
-  const { userId } = req.user as TTokenPayload;
-  const adminId = Number(req.params.id);
-
-  try {
-    if (adminId === userId) {
-      return res.status(400).json({ message: "Cannot delete self" });
-    }
-
-    await deleteUser(adminId);
-    return res.status(200).json("Admin deleted");
   } catch (error) {
     console.log(error);
     next(error);

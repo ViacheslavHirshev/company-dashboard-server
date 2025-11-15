@@ -9,7 +9,10 @@ import {
   updateCompanyLogo,
 } from "../../services/companyService";
 import { getUser } from "../../services/userService";
-import { countAllUserCompanies } from "../../services/dashboardService";
+import {
+  countAllCompanies,
+  countAllUserCompanies,
+} from "../../services/dashboardService";
 
 export async function userGetCompanies(
   req: Request,
@@ -157,7 +160,7 @@ export async function userAddNewCompany(
       message: "Company created",
       company: {
         name: newCompany.company_name,
-        created: newCompany.created_at,
+        createdAt: newCompany.created_at,
         capital: newCompany.capital,
         service: newCompany.service,
         address: newCompany.address,
@@ -301,8 +304,8 @@ export async function adminGetCompanies(
     : undefined;
 
   try {
-    const companies = (
-      await getAllCompaniesPaginated(
+    const [companiesResult, totalCount] = await Promise.all([
+      getAllCompaniesPaginated(
         limit,
         skip,
         undefined,
@@ -312,16 +315,23 @@ export async function adminGetCompanies(
         maxCapital,
         startDate,
         endDate
-      )
-    ).map((value) => {
+      ),
+      countAllCompanies(minCapital, maxCapital, startDate, endDate),
+    ]);
+
+    const companies = companiesResult.map((value) => {
       return {
         id: value.id,
         name: value.company_name,
         service: value.service,
+        capital: value.capital,
       };
     });
+    const totalPages = Math.ceil(totalCount / limit);
 
-    return res.status(200).json({ companies });
+    return res
+      .status(200)
+      .json({ companies, totalPages, currentPage: page, totalCount });
   } catch (error) {
     console.log(error);
     next(error);

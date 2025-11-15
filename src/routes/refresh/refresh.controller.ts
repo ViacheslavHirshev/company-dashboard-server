@@ -25,6 +25,7 @@ export function refreshController(
         if (err) return next(err);
 
         const accessToken = generateAccessToken(user.userId, user.roleId);
+        console.log("Access token refreshed");
 
         res.status(200).json({
           message: "Access token refreshed",

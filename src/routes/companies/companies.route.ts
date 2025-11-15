@@ -20,7 +20,7 @@ companiesRouter.use(jwtAuthMiddleware);
 companiesRouter.get("/", roleAccessMiddlware("user"), userGetCompanies);
 
 companiesRouter.get(
-  ["/admin", "/superadmin"],
+  "/admin",
   roleAccessMiddlware("admin", "superadmin"),
   adminGetCompanies
 );
@@ -33,7 +33,7 @@ companiesRouter.post(
 );
 
 companiesRouter.get(
-  ["/admin/:id", "/superadmin/:id"],
+  "/admin/:id",
   roleAccessMiddlware("admin", "superadmin"),
   adminGetCompany
 );

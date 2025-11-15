@@ -1,14 +1,14 @@
 import { Router } from "express";
 import { jwtAuthMiddleware } from "../../middleware/jwtAuthMiddleware";
 import {
-  getDashboardCompanies,
-  getDashboardUsers,
-  getDashboardAdmins,
-  postDashboardAdmin,
-  putDashboardAdmin,
+  getAllCompanies,
+  getAllUsers,
+  getAllAdmins,
+  createAdmin,
+  changeUser,
   getDashboard,
-  getDashboardAdmin,
-  deleteDashboardAdmin,
+  getUserById,
+  deleteUserById,
 } from "./dashboard.controller";
 import { roleAccessMiddlware } from "../../middleware/roleAccessMiddleware";
 
@@ -19,45 +19,45 @@ dashboardRouter.use(jwtAuthMiddleware);
 dashboardRouter.get("/", roleAccessMiddlware("user"), getDashboard);
 
 dashboardRouter.get(
-  ["/admin/users", "/superadmin/users"],
+  "/admin/users",
   roleAccessMiddlware("admin", "superadmin"),
-  getDashboardUsers
+  getAllUsers
 );
 
 dashboardRouter.get(
-  ["/admin/companies", "/superadmin/companies"],
+  "/admin/companies",
   roleAccessMiddlware("admin", "superadmin"),
-  getDashboardCompanies
+  getAllCompanies
+);
+
+dashboardRouter.get(
+  "/admin/users/:id",
+  roleAccessMiddlware("admin", "superadmin"),
+  getUserById
+);
+
+dashboardRouter.delete(
+  "/admin/users/:id",
+  roleAccessMiddlware("admin", "superadmin"),
+  deleteUserById
+);
+
+dashboardRouter.put(
+  "/admin/users/:id",
+  roleAccessMiddlware("admin", "superadmin"),
+  changeUser
 );
 
 dashboardRouter.get(
   "/superadmin/admins",
   roleAccessMiddlware("superadmin"),
-  getDashboardAdmins
+  getAllAdmins
 );
 
 dashboardRouter.post(
   "/superadmin/admins",
   roleAccessMiddlware("superadmin"),
-  postDashboardAdmin
-);
-
-dashboardRouter.get(
-  "/superadmin/admins/:id",
-  roleAccessMiddlware("superadmin"),
-  getDashboardAdmin
-);
-
-dashboardRouter.put(
-  "/superadmin/admins/:id",
-  roleAccessMiddlware("superadmin"),
-  putDashboardAdmin
-);
-
-dashboardRouter.delete(
-  "/superadmin/admins/:id",
-  roleAccessMiddlware("superadmin"),
-  deleteDashboardAdmin
+  createAdmin
 );
 
 export default dashboardRouter;

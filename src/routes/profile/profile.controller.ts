@@ -1,6 +1,5 @@
 import { NextFunction, Request, Response } from "express";
 import {
-  deleteAvatarFile,
   getRoleName,
   getUser,
   updateUser,

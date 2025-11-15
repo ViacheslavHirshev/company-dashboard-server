@@ -2,9 +2,9 @@ import prisma from "../config/prisma";
 import { getRoleId } from "./userService";
 
 // STATISTICS FOR USER
-export async function getNumberOfUserCompanies(userId: number) {
-  return await prisma.company.count({ where: { owner_id: userId } });
-}
+// export async function getNumberOfUserCompanies(userId: number) {
+//   return await prisma.company.count({ where: { owner_id: userId } });
+// }
 
 export async function getUserTotalCapital(userId: number) {
   return await prisma.company.aggregate({
@@ -70,7 +70,8 @@ export async function countAllCompanies(
 }
 
 export async function getTotalNumberOfUsers() {
-  return await prisma.app_user.count();
+  const role_id = await getRoleId("user");
+  return await prisma.app_user.count({ where: { role_id: role_id } });
 }
 
 export async function getTotalNumberOfCompanies() {
