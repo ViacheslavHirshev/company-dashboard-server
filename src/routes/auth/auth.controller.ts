@@ -2,7 +2,11 @@ import { NextFunction, Request, Response } from "express";
 import passport from "passport";
 import type { app_user } from "../../../generated/prisma/client";
 import { generateAccessToken, generateRefreshToken } from "../../utils/token";
-import { createUser, getRoleName } from "../../services/userService";
+import {
+  createUser,
+  getRoleName,
+  resetUserPassword,
+} from "../../services/userService";
 
 export async function signUpController(
   req: Request,
@@ -76,6 +80,22 @@ export async function signInController(
         });
       }
     )(req, res, next);
+  } catch (error) {
+    console.log(error);
+    next(error);
+  }
+}
+
+export async function resetPassword(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  const { email, newPassword } = req.body;
+
+  try {
+    await resetUserPassword(email, newPassword);
+    return res.status(200).json({ message: "Password reset" });
   } catch (error) {
     console.log(error);
     next(error);

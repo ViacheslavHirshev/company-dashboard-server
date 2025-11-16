@@ -116,6 +116,21 @@ export async function updateUserPassword(
   return updatedUser;
 }
 
+export async function resetUserPassword(email: string, newPassword: string) {
+  const user = await prisma.app_user.findUnique({ where: { email } });
+
+  if (!user) throw { status: 404, message: "User not found" };
+
+  const encrypted = await encryptPassword(newPassword);
+
+  const updatedUser = await prisma.app_user.update({
+    where: { id: user.id },
+    data: { password: encrypted },
+  });
+
+  return updatedUser;
+}
+
 export async function updateUserAvatar(userId: number, avatar?: string | null) {
   if (avatar !== undefined) {
     await deleteAvatarFile(userId);
