@@ -104,7 +104,7 @@ export async function updateUserPassword(
   const isPasswordSame = await comparePassword(currentPassword, currentHashed!);
 
   if (!isPasswordSame)
-    throw { status: 401, message: "Current password incorrect" };
+    throw { status: 400, message: "Current password incorrect" };
 
   const newEncrypted = await encryptPassword(newPassword);
 
