@@ -48,6 +48,7 @@ companiesRouter.patch(
   uploadLogo.single("logo"),
   userUpdateCompanyLogo
 );
+
 companiesRouter.delete("/:id", roleAccessMiddlware("user"), userDeleteCompany);
 
 export default companiesRouter;

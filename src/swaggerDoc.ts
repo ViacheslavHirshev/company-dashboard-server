@@ -518,66 +518,6 @@
  *       500:
  *         description: Internal server error
  *
- * /companies/superadmin:
- *   get:
- *     summary: Get all companies (superadmin)
- *     description: Returns a paginated list of all companies in the system. Identical to the admin endpoint, but also accessible to superadmin.
- *     tags:
- *       - Companies (Superadmin)
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - name: page
- *         in: query
- *         description: Page number (default is 1)
- *         schema:
- *           type: integer
- *       - name: limit
- *         in: query
- *         description: Number of items per page (default is 10)
- *         schema:
- *           type: integer
- *       - name: sortBy
- *         in: query
- *         description: Field to sort by (company_name or service)
- *         schema:
- *           type: string
- *           enum: [company_name, service]
- *       - name: sortOrder
- *         in: query
- *         description: Sort order
- *         schema:
- *           type: string
- *           enum: [asc, desc]
- *       - name: minCapital
- *         in: query
- *         description: Minimum company capital
- *         schema:
- *           type: number
- *       - name: maxCapital
- *         in: query
- *         description: Maximum company capital
- *         schema:
- *           type: number
- *       - name: startDate
- *         in: query
- *         description: Filter companies created after this date (ISO format)
- *         schema:
- *           type: string
- *           format: date
- *       - name: endDate
- *         in: query
- *         description: Filter companies created before this date (ISO format)
- *         schema:
- *           type: string
- *           format: date
- *     responses:
- *       200:
- *         description: Successfully retrieved all companies
- *       403:
- *         description: Forbidden access (only admin or superadmin allowed)
- *       500:
- *         description: Internal server error
  */
 
 /**
@@ -625,28 +565,6 @@
  *       403:
  *         description: Forbidden access (only admin or superadmin allowed)
  *
- * /app/companies/superadmin/{id}:
- *   get:
- *     summary: Get detailed company info (superadmin)
- *     description: Identical to the admin route, but also accessible to superadmin.
- *     tags:
- *       - Companies (Superadmin)
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - name: id
- *         in: path
- *         required: true
- *         description: Company ID
- *         schema:
- *           type: integer
- *     responses:
- *       200:
- *         description: Company details retrieved successfully
- *       404:
- *         description: Company not found
- *       403:
- *         description: Forbidden access (only admin or superadmin allowed)
  */
 
 /**
@@ -816,48 +734,6 @@
  *       500:
  *         description: Internal server error
  *
- * /dashboard/superadmin/users:
- *   get:
- *     summary: Get paginated list of users (superadmin)
- *     description: Same as admin endpoint, accessible to superadmin role as well.
- *     tags:
- *       - Dashboard (Superadmin)
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - name: page
- *         in: query
- *         description: Page number (default is 1)
- *         schema:
- *           type: integer
- *           example: 1
- *       - name: limit
- *         in: query
- *         description: Number of items per page (default is 10)
- *         schema:
- *           type: integer
- *           example: 10
- *       - name: sortBy
- *         in: query
- *         description: Sort by first or last name
- *         schema:
- *           type: string
- *           enum: [firstname, lastname]
- *           example: firstname
- *       - name: sortOrder
- *         in: query
- *         description: Sort order
- *         schema:
- *           type: string
- *           enum: [asc, desc]
- *           example: asc
- *     responses:
- *       200:
- *         description: Successfully retrieved user list
- *       403:
- *         description: Forbidden
- *       500:
- *         description: Internal server error
  */
 
 /**
@@ -936,67 +812,6 @@
  *                       service: { type: string, example: "Consulting" }
  *       403:
  *         description: Forbidden — only admin or superadmin allowed
- *       500:
- *         description: Internal server error
- *
- * /dashboard/superadmin/companies:
- *   get:
- *     summary: Get paginated list of all companies (superadmin)
- *     description: Same as the admin companies endpoint, but also accessible to superadmin.
- *     tags:
- *       - Dashboard (Superadmin)
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - name: page
- *         in: query
- *         description: Page number (default is 1)
- *         schema:
- *           type: integer
- *       - name: limit
- *         in: query
- *         description: Number of items per page (default is 10)
- *         schema:
- *           type: integer
- *       - name: sortBy
- *         in: query
- *         description: Field to sort by
- *         schema:
- *           type: string
- *           enum: [company_name, service]
- *       - name: sortOrder
- *         in: query
- *         description: Sort order
- *         schema:
- *           type: string
- *           enum: [asc, desc]
- *       - name: minCapital
- *         in: query
- *         description: Minimum company capital
- *         schema:
- *           type: number
- *       - name: maxCapital
- *         in: query
- *         description: Maximum company capital
- *         schema:
- *           type: number
- *       - name: startDate
- *         in: query
- *         description: Filter companies created after this date
- *         schema:
- *           type: string
- *           format: date
- *       - name: endDate
- *         in: query
- *         description: Filter companies created before this date
- *         schema:
- *           type: string
- *           format: date
- *     responses:
- *       200:
- *         description: Successfully retrieved companies data
- *       403:
- *         description: Forbidden
  *       500:
  *         description: Internal server error
  */
